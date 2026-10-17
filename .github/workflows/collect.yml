@@ -1,0 +1,27 @@
+name: 自动采集新闻
+
+on:
+  schedule:
+    # 每 30 分钟运行一次
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 运行采集脚本
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          # 可选代理：如果在 GitHub Secrets 中配置了 PROXY_URL，则自动挂载
+          PROXY_URL: ${{ secrets.PROXY_URL }}
+        run: python news_collector_v4.py
